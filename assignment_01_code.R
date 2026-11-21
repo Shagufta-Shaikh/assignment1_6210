@@ -78,29 +78,24 @@ df_trich_pap_retro
 
 ## Combining the data frames -----
 
+# EDIT 2 (SS): The cleaning step repeated the same str_remove_all() call in three separate mutate() lines for each species (six lines in total). These are replaced with one across() per species that applies the same cleaning to every column in ls_clean_cols. 
+
+ls_clean_cols = c("qry_left", "no_bp_in_complement", "in_repeat_end")
+
 df_trich_sp_final = df_trich_sp_retro |> 
-  mutate(species = "spiralis") |> 
-  mutate(qry_left = str_remove_all(string = qry_left, pattern = "-")) |> 
-  mutate(no_bp_in_complement = 
-           str_remove_all(string = no_bp_in_complement, pattern = "-")) |> 
-  mutate(in_repeat_end = 
-           str_remove_all(string = in_repeat_end, pattern = "-"))
-view(df_trich_sp_final)
+  mutate(species = "spiralis",
+         across(all_of(ls_clean_cols), ~ str_remove_all(.x, "-")))
 
 df_trich_pap_final = df_trich_pap_retro |> 
-  mutate(species = "papuae") |> 
-  mutate(qry_left = str_remove_all(string = qry_left, pattern = "[()]")) |> 
-  mutate(no_bp_in_complement = 
-           str_remove_all(string = no_bp_in_complement, pattern = "[()]")) |> 
-  mutate(in_repeat_end = 
-           str_remove_all(string = in_repeat_end, pattern = "[()]"))
+  mutate(species = "papuae",
+         across(all_of(ls_clean_cols), ~ str_remove_all(.x, "[()]")))
 
 #Adding a column indicating which species before combining
 #Formatting so that the bind_rows function can run without error.
 #Formatting done was removing "()" and "-" from values in those 3 columns
 
 df_trich_combined = bind_rows(df_trich_sp_final, df_trich_pap_final)
-
+view(df_trich_combined)
 #Combined data frames for more analysis options
 
 ## Figures -----
