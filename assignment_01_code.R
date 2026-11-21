@@ -6,7 +6,16 @@
 ## 2026-10-27
 ##
 ##***************************
-
+#Contributions:
+## - Original author: Kristian (GitHub: kgonzales86). Wrote the originalscript.
+## - Secondary contributor: Shagufta (GitHub: Shagufta-Shaikh).
+##   Edit 1: Added PLE and PLE/Naiad to the retrotransposon lists, merged the
+##           duplicated non-TE list, and added class counts to check the filters.
+##   Edit 2: Replaced repeated mutate() calls with across().
+##   Edit 3: Replaced five separate plots with one faceted histogram and
+##           frequency polygon figure.
+##   Minor: Updated file paths and added explanatory comments (marked "SS").
+##***************************
 rm(list = ls())
 
 ## Packages used -------
@@ -100,36 +109,17 @@ view(df_trich_combined)
 
 ## Figures -----
 
-df_trich_sp_retro |> 
-  ggplot(aes(perc_insert)) +
-  geom_histogram() +
-  labs(x = "Percent Insertion", y = "Frequency", 
-       title = "Percent Insertion for Trichinella Spiralis")
+# EDIT 3 (SS): The original script made five separate plots (a histogram and a frequency polygon for each species, plus a combined frequency polygon), so the species had to be compared across different figures. They are replaced by one faceted figure that shows the histogram and the frequency polygon together, with the species stacked on a shared x-axis and the same y-axis scale, so they can be compared directly.
 
-df_trich_pap_retro |> 
-  ggplot(aes(perc_insert)) +
-  geom_histogram() +
-  labs(x = "Percent Insertion", y = "Frequency", 
-       title = "Percent Insertion for Trichinella Papuae")
-
-df_trich_sp_retro |> 
-  ggplot(aes(perc_insert)) +
-  geom_freqpoly() +
-  labs(x = "Percent Insertion", y = "Frequency", 
-       title = "Percent Insertion for Trichinella Spiralis")
-
-df_trich_pap_retro |> 
-  ggplot(aes(perc_insert)) +
-  geom_freqpoly() +
-  labs(x = "Percent Insertion", y = "Frequency", 
-       title = "Percent Insertion for Trichinella Papuae")
-
-df_trich_combined |> 
-  ggplot(aes(perc_insert)) +
-  geom_freqpoly() +
-  facet_grid(~ species) +
-  labs(x = "Percent Insertion", y = "Frequency", 
-       title = "Percent Insertion for Trichinella Papuae and Spiralis")
+per_insert_fig <- df_trich_combined |> 
+  ggplot(aes(x = perc_insert, fill = species, colour = species)) +
+  geom_histogram(bins = 30, alpha = 0.4, show.legend = FALSE) +
+  geom_freqpoly(bins = 30, linewidth = 0.8, show.legend = FALSE) +
+  facet_wrap(~ species, ncol = 1) +
+  labs(x = "Percent Insertion", y = "Frequency",
+       title = "Percent Insertion of Retrotransposons in Two Trichinella Species")
+per_insert_fig
+ggsave("per_insert_fig.png")
 
 ## Potential novel code -----
   
